@@ -1,30 +1,30 @@
 name: Sync from upstream repository
 
 on:
-  # Schedule the workflow (daily at 00:00 UTC)
   schedule:
     - cron: "0 0 * * *"
-  # Allow manual trigger
   workflow_dispatch:
 
+permissions:
+  contents: write 
+
 jobs:
-  sync:
+  sync-fork:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      - name: Check out fork
-        uses: actions/checkout@v2
+      - name: Check out your fork
+        uses: actions/checkout@v3
         with:
-          persist-credentials: false  # Ensures we don't reuse the automatic token for pushing
+          persist-credentials: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Git
         run: |
           git config user.name "GitHub Actions"
           git config user.email "[email protected]"
 
-      - name: Add upstream
+      - name: Add upstream and fetch
         run: |
           git remote add upstream https://github.com/firehol/blocklist-ipsets.git
           git fetch upstream
@@ -32,8 +32,7 @@ jobs:
       - name: Merge upstream changes
         run: |
           git checkout master
-          git merge upstream/master --allow-unrelated-histories
+          git merge upstream/master
 
-      - name: Push changes
-        run: |
-          git push origin master
+      - name: Push changes to fork
+        run: git push origin HEAD:master
