@@ -26,17 +26,14 @@ jobs:
 
       - name: Add upstream
         run: |
-          # Replace the URL if your original remote differs
           git remote add upstream https://github.com/firehol/blocklist-ipsets.git
           git fetch upstream
 
       - name: Merge upstream changes
         run: |
-          # Checkout your default branch; adjust "master" if needed
           git checkout master
-          git merge upstream/master
+          git merge upstream/master --allow-unrelated-histories
 
       - name: Push changes
         run: |
-          # Push merges back to your fork
           git push origin master
